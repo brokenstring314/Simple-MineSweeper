@@ -16,6 +16,11 @@ const judgeResult = (): boolean => {
 const leftClickCell = (cell: Cell) => {
   if (currentGame.gameStatus == 'Finished') return
   if (cell.open == true) return
+  if(cell.flag){
+    cell.flag = false;
+    currentGame.flag--;
+    return
+  }//旗子不能再直接点开，直接点时消除旗子
   cell.open = true
   currentGame.openGridNumber++;
   //点击的格子本身也要计入
@@ -29,7 +34,7 @@ const leftClickCell = (cell: Cell) => {
     currentGame.gameStatus = 'InProgress'
   if (judgeResult()) return
   //judgeResult对了就赢了
-  let cellQueue: Cell[] = []
+  let cellQueue: Cell[] = [];
   cellQueue.push(cell);
   while (cellQueue.length !== 0) {
     let opr = cellQueue.shift();
@@ -37,8 +42,12 @@ const leftClickCell = (cell: Cell) => {
     //下面是因为某个合法加入队列的元素同时有两个不同父元素
     //也就是说从其父元素遍历此元素会重复遍历到此处
     //所以计算开过格子的数量必须检查格子是否开过
-    if (!opr.open) currentGame.openGridNumber++;
-    opr.open = true;
+    if(opr.flag) continue;
+      //旗子不能再间接点开，而是保留旗子
+    if (!opr.open) {
+      currentGame.openGridNumber++;
+      opr.open = true;
+    }
     if (opr.number) continue
     for (let i = 0; i < 8; i++) {
       if (opr.y + delta_y[i] >= 0 && opr.y + delta_y[i] < currentGame.yCellNumber && opr.x + delta_x[i] >= 0 && opr.x + delta_x[i] < currentGame.xCellNumber) {
@@ -59,7 +68,6 @@ let rightClickCell = (cell: Cell, event: any) => {
     cell.flag = true;
     currentGame.flag++;
   } else if (cell.flag) {
-    console.log(3)
     cell.flag = false;
     currentGame.flag--;
   }
@@ -102,13 +110,13 @@ let rightClickCell = (cell: Cell, event: any) => {
          :style="`width:${currentGame.xCellNumber*29.76}px`">
       <!-- 0 - 8 是扫雷格子的编号，bg-base 是基础背景色，border 是边框，p-2 是内边距 -->
       <div v-for="currentLine in currentGame.cell" class="p-0 m-0 w-4">
-        <div v-for="n in currentLine" :id="n.open ? 'blankCell' : 'cell'" class="p-1 text-center"
+        <div v-for="n in currentLine" :id="n.open ? 'blankCell' : 'cell'" class="p-1 text-center no-select"
              @click="leftClickCell(n)" @contextmenu="rightClickCell(n,$event)" >
-          <div v-if="n.open && n.number && !n.mine" class="flex justify-center"><img class="h-4 w-4"
+          <div v-if="n.open && n.number && !n.mine" class="flex justify-center no-select"><img class="h-4 w-4 no-select"
                                                                                      :src="`/number/${n.number}.png`">
           </div>
-          <div v-if="n.open && n.mine" class="flex justify-center"><img class="h-5 w-5" src="/mark/mine.svg"></div>
-          <div v-if="!n.open && n.flag" class="flex justify-center"><img class="h-5 w-5" src="/mark/flag.svg"></div>
+          <div v-if="n.open && n.mine" class="flex justify-center no-select"><img class="h-5 w-5 no-select" src="/mark/mine.svg"></div>
+          <div v-if="!n.open && n.flag" class="flex justify-center no-select"><img class="h-5 w-5 no-select" src="/mark/flag.svg"></div>
         </div>
       </div>
     </div>
@@ -116,6 +124,14 @@ let rightClickCell = (cell: Cell, event: any) => {
 </template>
 
 <style scoped>
+.no-select {
+  -webkit-touch-callout:none; /* 禁用iOS的长按弹出菜单 */
+  -webkit-user-select:none;    /* 禁用webkit浏览器的选择功能 */
+  -moz-user-select:none;       /* 火狐浏览器选择功能 */
+  -ms-user-select:none;        /* IE10选择功能 */
+  user-select:none;             /* 标准CSS选择功能 */
+}
+
 #cell {
   height: 1rem;
   width: 1rem;
