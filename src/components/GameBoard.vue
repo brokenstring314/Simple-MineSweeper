@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {inject, Ref, ref} from "vue";
+import {inject} from "vue";
 import {delta_x, delta_y} from "../utils/newGame.ts";
 
 let currentGame: Game = inject('currentGame')!
