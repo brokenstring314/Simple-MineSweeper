@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {inject} from "vue";
+import {inject, Ref, ref} from "vue";
 import {delta_x, delta_y} from "../utils/newGame.ts";
 
-let currentGame: Game = inject('currentGame')
+let currentGame: Game = inject('currentGame')!
 
 const judgeResult = (): boolean => {
   if (currentGame.openGridNumber == currentGame.xCellNumber * currentGame.yCellNumber - currentGame.mine) {
@@ -59,6 +59,7 @@ let rightClickCell = (cell: Cell, event: any) => {
     cell.flag = true;
     currentGame.flag++;
   } else if (cell.flag) {
+    console.log(3)
     cell.flag = false;
     currentGame.flag--;
   }
@@ -66,25 +67,32 @@ let rightClickCell = (cell: Cell, event: any) => {
   // 阻止浏览器的默认上下文菜单显示
 }
 
-let longPressTimer: number = 0;
-
-const TouchStart = (cell: Cell) => {
-  longPressTimer = setTimeout(() => {
-    if (cell.open) return
-    if (!cell.flag) {
-      cell.flag = true;
-      currentGame.flag++;
-    } else if (cell.flag) {
-      cell.flag = false;
-      currentGame.flag--;
-    }
-    console.log('长按事件触发');
-  }, 500);
-};
-
-const TouchEnd = () => {
-  clearTimeout(longPressTimer);
-};
+// let longPressTimer: number = 0;
+// let touchNow:Ref<boolean> = ref(false)
+// 默认长按就是替代右键菜单，所以不用单独设置长按事件
+// const TouchStart = (cell: Cell) => {
+//   longPressTimer = setTimeout(() => {
+//     if (cell.open) return
+//     if (touchNow.value) return
+//     touchNow.value = true
+//     console.log(1)
+//     if (!cell.flag  && (currentGame.mine - currentGame.flag > 0)) {
+//       console.log(2)
+//       cell.flag = true;
+//       currentGame.flag++;
+//     } else if (cell.flag) {
+//       console.log(3)
+//       cell.flag = false;
+//       currentGame.flag--;
+//     }
+//     console.log('长按事件触发');
+//   }, 600);
+// };
+//
+// const TouchEnd = () => {
+//   touchNow.value = false
+//   clearTimeout(longPressTimer);
+// };
 
 </script>
 
@@ -95,8 +103,7 @@ const TouchEnd = () => {
       <!-- 0 - 8 是扫雷格子的编号，bg-base 是基础背景色，border 是边框，p-2 是内边距 -->
       <div v-for="currentLine in currentGame.cell" class="p-0 m-0 w-4">
         <div v-for="n in currentLine" :id="n.open ? 'blankCell' : 'cell'" class="p-1 text-center"
-             @click="leftClickCell(n)" @contextmenu="rightClickCell(n,$event)" @touchstart="TouchStart(n)"
-             @touchend="TouchEnd()">
+             @click="leftClickCell(n)" @contextmenu="rightClickCell(n,$event)" >
           <div v-if="n.open && n.number && !n.mine" class="flex justify-center"><img class="h-4 w-4"
                                                                                      :src="`/number/${n.number}.png`">
           </div>

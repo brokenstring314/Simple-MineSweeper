@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {inject} from "vue";
 
-let currentGame: Game = inject('currentGame')
+let currentGame: Game = inject('currentGame')!
 
 const emit = defineEmits(["reGame"])
 
