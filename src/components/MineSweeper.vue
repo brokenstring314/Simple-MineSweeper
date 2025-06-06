@@ -4,10 +4,13 @@ import {provide, reactive, Ref, ref, watch} from "vue";
 import OperatingPanel from "./OperatingPanel.vue";
 import ScoreBoard from "./ScoreBoard.vue";
 import {newGame} from "../utils/newGame.ts";
+import {GameTimer} from "../utils/timer.ts";
 
 const gameMode:Ref = ref(localStorage.getItem("mineSweeperGameMode")?localStorage.getItem("mineSweeperGameMode"):"beginner")
 let currentGame: any = reactive(newGame(gameMode.value))
 const properties = ['cell', 'mine', 'flag',"openGridNumber", 'xCellNumber', 'yCellNumber', 'gameStatus', 'gameStart', 'gameTime', 'gameResult'];
+
+const gameTimer = new GameTimer();
 
 let startNewGame = () => {
   console.log("startNewGame")
@@ -15,7 +18,18 @@ let startNewGame = () => {
   for(let opr of properties){
     currentGame[opr] = game[opr]
   }
+  gameTimer.resetTimer();
 }
+
+watch(() => currentGame.gameStatus, (newStatus) => {
+  if (newStatus === 'InProgress') {
+    gameTimer.startTimer((time) => {
+      currentGame.gameTime = time;
+    });
+  } else if (newStatus === 'Finished') {
+    gameTimer.stopTimer();
+  }
+});
 
 watch(gameMode,(newValue)=>{
   localStorage.setItem("mineSweeperGameMode",newValue)
@@ -23,7 +37,6 @@ watch(gameMode,(newValue)=>{
 
 provide(/* 注入名 */ 'currentGame', /* 值 */ currentGame)
 provide(/* 注入名 */ 'gameMode', /* 值 */gameMode)
-
 
 </script>
 

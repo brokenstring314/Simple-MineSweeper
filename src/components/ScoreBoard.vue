@@ -24,7 +24,7 @@ let optionButton = function () {
         <span v-if="currentGame.gameResult==='Victory'">你赢了，牛比</span>
       </div>
     </div>
-<!--    <div class="text-lg">游戏时间:{{}}</div>-->
+    <div class="text-lg">游戏时间: {{currentGame.gameTime}}秒</div>
   </div>
 </template>
 

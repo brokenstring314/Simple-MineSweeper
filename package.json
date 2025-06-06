@@ -1,7 +1,7 @@
 {
   "name": "minesweeper",
   "private": true,
-  "version": "v0.1",
+  "version": "v0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",

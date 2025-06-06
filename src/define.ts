@@ -27,7 +27,8 @@ interface Cell {
     mine: boolean,
     open: boolean,
     number: number,
-    flag: boolean
+    flag: boolean,
+    wrongFlag?: boolean
 }
 
 interface GameTimer {
